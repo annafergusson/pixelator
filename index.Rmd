@@ -154,28 +154,31 @@ function fromURL(){
 }
 
 function processPhoto(){
-  var sample_size = Math.max($("#sample_size").val() * 1, 0);
-  var photo_label = $("#photo_label").val();
-  photo_label = photo_label.split(" ").join("_");
-  $("#photo_label").val(photo_label);
-  var canvas = document.getElementById("gsphoto");
-  var context = canvas.getContext('2d');
-  var imgData = context.getImageData(0, 0, canvas.width, canvas.height);
-  var data = [];
-  for (var i = 0; i < pixels.length; i += 4) {
-      var red = pixels[i];
-      var green = pixels[i + 1];
-      var blue = pixels[i + 2];
-      var gs = parseInt((pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3);
-      var hue = rgbToHsl(red, green, blue)[0];
-      var sat = rgbToHsl(red, green, blue)[1];
-      var hex = rgbToHex(red, green, blue);
-      data.push({photo_label: photo_label, red: red, green: green, blue: blue, hue: hue, saturation: saturation, grayscale: gs, hex_code: hex})
+  if($('#gsphoto').length){
+    var sample_size = Math.max($("#sample_size").val() * 1, 0);
+    var photo_label = $("#photo_label").val();
+    photo_label = photo_label.split(" ").join("_");
+    $("#photo_label").val(photo_label);
+    var canvas = document.getElementById("gsphoto");
+    var context = canvas.getContext('2d');
+    var imgData = context.getImageData(0, 0, canvas.width, canvas.height);
+    var pixels = imgData.data;
+    var data = [];
+    for (var i = 0; i < pixels.length; i += 4) {
+        var red = pixels[i];
+        var green = pixels[i + 1];
+        var blue = pixels[i + 2];
+        var gs = parseInt((pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3);
+        var hue = rgbToHsl(red, green, blue)[0];
+        var sat = rgbToHsl(red, green, blue)[1];
+        var hex = rgbToHex(red, green, blue);
+        data.push({photo_label: photo_label, red: red, green: green, blue: blue, hue: hue, saturation: saturation, grayscale: gs, hex_code: hex})
+    }
+    
+    shuffle(data);
+    var sampled_data = data.slice(0, min(sample_size, pixels.length/4))
+    doStuff(data);
   }
-  
-  shuffle(data);
-  var sampled_data = data.slice(0, min(sample_size, pixels.length/4))
-  doStuff(data);
 }
 
 function shuffle(array) {
