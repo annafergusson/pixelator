@@ -72,7 +72,7 @@ Label the photo <input id='photo_label' value='photo1'>
 
 Add the image data to the table <input id='table_name' value='table1'>
 
-<button class='but' onclick="processPhoto()'>Process</button>
+<button class='but' onclick="processPhoto()">Process</button>
 
 </div>
 
