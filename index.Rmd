@@ -131,7 +131,7 @@ function fromURL(){
     canvas.height = img.height;
     canvas.id = "colphoto";
     context.drawImage(img, 0, 0, img.width, img.height);
-    $("#photo-frame-1").append(canvas);
+    $("#photo-frame-1").html(canvas);
     
     // create grayscale
     var canvas3 = document.createElement('canvas');
@@ -150,7 +150,7 @@ function fromURL(){
       pixels[i + 2] = lightness;
     }
     context3.putImageData(imgData, 0, 0);
-    $("#photo-frame-2").append(canvas3);
+    $("#photo-frame-2").html(canvas3);
   }
 }
 
