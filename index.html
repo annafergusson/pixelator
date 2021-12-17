@@ -321,20 +321,22 @@ function processPhoto(){
     var imgData = context.getImageData(0, 0, canvas.width, canvas.height);
     var pixels = imgData.data;
     var data = [];
-    for (var i = 0; i < pixels.length; i += 4) {
-        var red = pixels[i];
-        var green = pixels[i + 1];
-        var blue = pixels[i + 2];
-        var gs = parseInt((pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3);
+    for (var i = 0; i < Math.min(sample_size, pixels.length/4); i += 1) {
+        var rand = Math.floor(Math.random() * (pixels.length/4))
+        var red = pixels[4*i];
+        var green = pixels[4*i + 1];
+        var blue = pixels[4*i + 2];
+        var gs = parseInt((red + green + blue) / 3);
         var hue = rgbToHsl(red, green, blue)[0];
         var sat = rgbToHsl(red, green, blue)[1];
         var hex = rgbToHex(red, green, blue);
         data.push({photo_label: photo_label, red: red, green: green, blue: blue, hue: hue, saturation: sat, grayscale: gs, hex_code: hex})
     }
     
-    shuffle(data);
-    var sampled_data = data.slice(0, Math.min(sample_size, pixels.length/4))
-    doStuff(data);
+    //shuffle(data);
+    //var sampled_data = data.slice(0, Math.min(sample_size, pixels.length/4))
+    //alert(data.length)
+    doStuff([data]);
   }
 }
 
