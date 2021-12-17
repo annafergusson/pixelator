@@ -49,8 +49,6 @@ input {width: 100px}
 **Import photo**
 
 URL: <input id='url' type='text' style = 'width:300px' value='https://images.unsplash.com/photo-1456677698485-dceeec22c7fc'> <button class='but' onclick='fromURL()'>Import</button>
-
-**OR** <button class='but'>Upload photo</button>
 </div>
 
 <div class='sectiony'>
@@ -157,6 +155,7 @@ function fromURL(){
 function processPhoto(){
   if($('#gsphoto').length){
     var sample_size = Math.max($("#sample_size").val() * 1, 0);
+    var url = $("#url").val();
     var photo_label = $("#photo_label").val();
     photo_label = photo_label.split(" ").join("_");
     $("#photo_label").val(photo_label);
@@ -177,7 +176,7 @@ function processPhoto(){
         var sat = rgbToHsl(red, green, blue)[1];
         var hex = rgbToHex(red, green, blue);
         var shade = rgbToHex(gs, gs, gs);
-        data.push({photo_label: photo_label, red: red, green: green, blue: blue, hue: hue, saturation: sat, grayscale: gs, hex_code: hex, gray_shade: shade})
+        data.push({photo_label: photo_label, photo_url: url, red: red, green: green, blue: blue, hue: hue, saturation: sat, grayscale: gs, hex_code: hex, gray_shade: shade})
     }
     
     //shuffle(data);
