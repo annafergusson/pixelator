@@ -1,0 +1,346 @@
+---
+title: Data generator
+output: 
+  html_document:
+    includes:
+      in_header: header.html
+---
+
+```{css echo=FALSE}
+/* Absolute Center Spinner */
+.loading {
+  z-index: 999;
+  overflow: show;
+  margin: auto;
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.3);
+}
+
+.title {
+  display: none;
+}
+
+.shadey {background: #F0F0F0}
+    
+.sectiony {
+  margin-top: 20px;
+}
+  
+img, canvas{width:100%}
+  
+input {width: 100px}
+
+.but {margin-left: 5px}
+
+#footer{padding: 20px; background: #F6ECEA; margin-top: 20px;}
+  
+```
+
+<div class='loading' style='display:none'></div>
+
+
+<div class='sectiony'>
+
+**Import photo**
+
+URL: <input id='url' type='text' style = 'width:300px' value='https://images.unsplash.com/photo-1456677698485-dceeec22c7fc'> <button class='but' onclick='fromURL()'>Import</button>
+
+**OR** <button class='but'>Upload photo</button>
+</div>
+
+<div class='sectiony'>
+<div class='row'>
+<div class='col-sm-6' id='photo-frame-1'>
+</div>
+<div class='col-sm-6' id='photo-frame-2'>
+</div>
+</div>
+</div>
+
+<div class='sectiony'>
+
+**Process photo**
+
+Randomly sample <input id='sample_size' value=200> pixels from the photo
+
+Label the photo <input id='photo_label' value='photo1'>
+
+Add the image data to the table <input id='table_name' value='table1'>
+
+<button class='but'>Process</button>
+
+</div>
+
+<div id='footer'>This plugin was developed by Anna Fergusson, University of Auckland.</div>
+
+```{js echo=FALSE}
+$().ready(function(){
+
+  // set interface
+  var kAppName = "pixelator";
+  var kVersion = "1.0";
+  var kDimensions = {width: 400, height: 600};
+  
+  codapInterface.init({
+    title: kAppName,
+    dimensions: kDimensions,
+    version: kVersion,
+    preventDataContextReorg: false,
+  }).then(function (result) {
+    myState = codapInterface.getInteractiveState();
+  }).then(function () {
+  // initialise tool
+    if (myState.probs === undefined || myState.probs === null) {
+      // set up default
+      
+    }
+    else
+    {
+  	  //use values saved in state to set options for the tool
+      //var outcomes = myState.outcomes;
+      
+    }
+    
+  }).catch(function (msg) {
+      //for testing outside CODAP
+
+  });
+  
+});
+
+
+function fromURL(){
+  var url = $("#url").val()
+  var img = new Image();
+  //because we are accessing an image from another server
+  //this won't always work though
+  img.src = url + '?' + new Date().getTime();
+  img.setAttribute('crossOrigin', '');
+  img.crossOrigin = "Anonymous";
+  //need to wait until the image is loaded
+  img.onload = function()
+  {
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    context.drawImage(img, 0, 0, img.width, img.height);
+    $("#photo-frame-1").append(canvas);
+    
+    // create grayscale
+    var canvas3 = document.createElement('canvas');
+    var context3 = canvas3.getContext('2d');
+    canvas3.width  = img.width;
+    canvas3.height = img.height;
+    canvas3.id = "gsphoto";
+    context3.drawImage(img, 0, 0, img.width, img.height);
+    
+    var imgData = context3.getImageData(0, 0, canvas3.width, canvas3.height);
+    var pixels = imgData.data;
+    for (var i = 0; i < pixels.length; i += 4) {
+      var lightness = parseInt((pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3);
+      pixels[i] = lightness;
+      pixels[i + 1] = lightness;
+      pixels[i + 2] = lightness;
+    }
+    context3.putImageData(imgData, 0, 0);
+    $("#photo-frame-2").append(canvas3);
+  }
+}
+
+function processPhoto(){
+  var sample_size = Math.max($("#sample_size").val() * 1, 0);
+  var photo_label = $("#photo_label").val();
+  photo_label = photo_label.split(" ").join("_");
+  $("#photo_label").val(photo_label);
+  var canvas = document.getElementById("gsphoto");
+  var context = canvas.getContext('2d');
+  var imgData = context.getImageData(0, 0, canvas.width, canvas.height);
+  var data = [];
+  for (var i = 0; i < pixels.length; i += 4) {
+      var red = pixels[i];
+      var green = pixels[i + 1];
+      var blue = pixels[i + 2];
+      var gs = parseInt((pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3);
+      var hue = rgbToHsl(red, green, blue)[0];
+      var sat = rgbToHsl(red, green, blue)[1];
+      var hex = rgbToHex(red, green, blue);
+      data.push{photo_label: photo_label, red: red, green: green, blue: blue, hue: hue, saturation: saturation, grayscale: gs, hex_code: hex}
+  }
+  
+  shuffle(data);
+  var sampled_data = data.slice(0, min(sample_size, pixels.length/4))
+  doStuff(data);
+}
+
+function shuffle(array) {
+	  var currentIndex = array.length, temporaryValue, randomIndex ;
+
+	  // While there remain elements to shuffle...
+	  while (0 !== currentIndex) {
+
+		// Pick a remaining element...
+		randomIndex = Math.floor(Math.random() * currentIndex);
+		currentIndex -= 1;
+
+		// And swap it with the current element.
+		temporaryValue = array[currentIndex];
+		array[currentIndex] = array[randomIndex];
+		array[randomIndex] = temporaryValue;
+	  }
+
+	  return array;
+}
+
+function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+function componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+
+function rgbToHsl(r, g, b) {
+  r /= 255, g /= 255, b /= 255;
+
+  var max = Math.max(r, g, b), min = Math.min(r, g, b);
+  var h, s, l = (max + min) / 2;
+
+  if (max == min) {
+    h = s = 0; // achromatic
+  } else {
+    var d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+
+    h /= 6;
+  }
+
+  return [ h, s, l ];
+}
+
+function hslToRgb(h, s, l) {
+  var r, g, b;
+
+  if (s == 0) {
+    r = g = b = l; // achromatic
+  } else {
+    function hue2rgb(p, q, t) {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q - p) * 6 * t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    }
+
+    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    var p = 2 * l - q;
+
+    r = hue2rgb(p, q, h + 1/3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1/3);
+  }
+
+  return [ r * 255, g * 255, b * 255 ];
+}
+
+
+function saveState(){
+  //save
+  if (typeof myState !== 'undefined')
+  {
+    //myState.outcomes = outcomes;
+
+  }
+}
+
+function doStuff(dataframe){
+ 
+    var data = dataframe;
+    var attributes = Object.keys(data[0]);
+    var tableName = $("#table_name").val();
+    tableName = tableName.split(" ").join("_");
+    $("#table_name").val(tableName);
+    var kAttributes = [];
+    for(var i = 0; i < attributes.length; i++)
+    {
+      kAttributes.push({name: attributes[i]})
+    }
+    
+    codapInterface.sendRequest({
+        action:'get',
+        resource: 'dataContext[' + tableName + ']'
+      }).then(function(result){
+        if (result && !result.success) {
+          codapInterface.sendRequest({
+      "action": "create",
+      "resource": "dataContext",
+      "values": {
+        "name": tableName,
+        "collections": [ {
+          "name": tableName,
+          "attrs": kAttributes
+        }]
+      }
+    })
+        } 
+      }).then(function(){
+      codapInterface.sendRequest({
+      "action": "create",
+      "resource": "dataContext[" + tableName + "].item",
+       "values": data
+    })
+    }).then(function(){
+       //guaranteeCaseTable(tableName)
+       codapInterface.sendRequest({action: 'create', resource: 'component', values: {
+            type: 'caseTable',
+            dataContext: tableName
+          }})
+    })
+
+}
+
+
+// from example CODAP plugin
+function guaranteeCaseTable(name) {
+  return new Promise(function (resolve, reject) {
+    codapInterface.sendRequest({
+      action: 'get',
+      resource: 'componentList'
+    })
+    .then (function (iResult) {
+      if (iResult.success) {
+        // look for a case table in the list of components.
+        if (iResult.values && iResult.values.some(function (component) {
+              return component.type === 'caseTable'
+            })) {
+          resolve(iResult);
+        } else {
+          codapInterface.sendRequest({action: 'create', resource: 'component', values: {
+            type: 'caseTable',
+            dataContext: name
+          }}).then(function (result) {
+            resolve(result);
+          });
+        }
+      } else {
+        reject('api error');
+      }
+    })
+  });
+}
+
+```
