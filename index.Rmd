@@ -176,7 +176,8 @@ function processPhoto(){
         var hue = rgbToHsl(red, green, blue)[0];
         var sat = rgbToHsl(red, green, blue)[1];
         var hex = rgbToHex(red, green, blue);
-        data.push({photo_label: photo_label, red: red, green: green, blue: blue, hue: hue, saturation: sat, grayscale: gs, gray_shade: hex})
+        var shade = rgbToHex(gs, gs, gs);
+        data.push({photo_label: photo_label, red: red, green: green, blue: blue, hue: hue, saturation: sat, grayscale: gs, hex_code: hex, gray_shade: shade})
     }
     
     //shuffle(data);
