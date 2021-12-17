@@ -55,9 +55,9 @@ URL: <input id='url' type='text' style = 'width:300px' value='https://images.uns
 
 <div class='sectiony'>
 <div class='row'>
-<div class='col-sm-6' id='photo-frame-1'>
+<div class='col-xs-6' id='photo-frame-1'>
 </div>
-<div class='col-sm-6' id='photo-frame-2'>
+<div class='col-xs-6' id='photo-frame-2'>
 </div>
 </div>
 </div>
@@ -72,7 +72,7 @@ Label the photo <input id='photo_label' value='photo1'>
 
 Add the image data to the table <input id='table_name' value='table1'>
 
-<button class='but'>Process</button>
+<button class='but' onclick="processPhoto()'>Process</button>
 
 </div>
 
@@ -84,7 +84,7 @@ $().ready(function(){
   // set interface
   var kAppName = "pixelator";
   var kVersion = "1.0";
-  var kDimensions = {width: 400, height: 600};
+  var kDimensions = {width: 500, height: 600};
   
   codapInterface.init({
     title: kAppName,

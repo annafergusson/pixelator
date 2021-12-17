@@ -215,10 +215,10 @@ input {width: 100px}
 </div>
 <div class="sectiony">
 <div class="row">
-<div id="photo-frame-1" class="col-sm-6">
+<div id="photo-frame-1" class="col-xs-6">
 
 </div>
-<div id="photo-frame-2" class="col-sm-6">
+<div id="photo-frame-2" class="col-xs-6">
 
 </div>
 </div>
@@ -228,9 +228,7 @@ input {width: 100px}
 <p>Randomly sample <input id="sample_size" value="200"> pixels from the photo</p>
 <p>Label the photo <input id="photo_label" value="photo1"></p>
 <p>Add the image data to the table <input id="table_name" value="table1"></p>
-<button class="but">
-Process
-</button>
+<p>&lt;button class=‘but’ onclick=&quot;processPhoto()’&gt;Process</button></p>
 </div>
 <div id="footer">
 This plugin was developed by Anna Fergusson, University of Auckland.
@@ -241,7 +239,7 @@ $().ready(function(){
   // set interface
   var kAppName = "pixelator";
   var kVersion = "1.0";
-  var kDimensions = {width: 400, height: 600};
+  var kDimensions = {width: 500, height: 600};
   
   codapInterface.init({
     title: kAppName,
