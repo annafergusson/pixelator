@@ -117,7 +117,8 @@ function fromURL(){
   var img = new Image();
   //because we are accessing an image from another server
   //this won't always work though
-  img.src = url + '?' + new Date().getTime();
+ // img.src = url + '?' + new Date().getTime();
+  img.src = url;
   img.setAttribute('crossOrigin', '');
   img.crossOrigin = "Anonymous";
   //need to wait until the image is loaded
